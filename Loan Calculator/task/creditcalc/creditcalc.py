@@ -1,9 +1,14 @@
 import math
 
 
-def calc_period(p, a):
+def calc_period(lp, mp, rate):
+    # interest rate
+    i = rate / 12 / 100
     # number of months
-    m = math.ceil(p / a)
+    n = math.log(mp / (mp - i * lp), 1 + i)
+    m = math.floor(n)
+    if n > m:
+        m += 1
     y = m // 12
     m -= y * 12
     word = ""
@@ -13,28 +18,56 @@ def calc_period(p, a):
     if m > 0:
         w_month = "months" if m > 1 else "month"
         word += f"{m} {w_month}"
-    print(f"It will take {word} to repay the loan")
+    print(f"It will take {word} to repay this loan!")
 
 
-def calc_payment(p, n):
-    month_pay = math.ceil(p / n)
-    last_pay = p - month_pay * (n - 1)
-    result = "Your monthly payment = " + str(month_pay)
-    if last_pay != month_pay:
+def calc_payment(lp, n, rate):
+    # interest rate
+    i = rate / 12 / 100
+    j = (1 + i) ** n
+    mp = math.ceil(lp * i * j / (j - 1))
+    last_pay = lp - mp * n
+    result = "Your monthly payment = " + str(mp)
+    if last_pay > 0:
         result += " and the last payment = " + str(last_pay)
-    print(result)
+    print(result + "!")
 
 
-print("Enter the loan principal:")
-loan_pay = int(input())
+def calc_apayment(a, n, rate):
+    # interest rate
+    i = rate / 12 / 100
+    j = (1 + i) ** n
+    p = round(a * (j - 1) / (i * j))
+    print(f"Your loan principal = {p}!")
+
+
 print('''What do you want to calculate?
-type "m" - for number of monthly payments,
-type "p" - for the monthly payment:''')
+type "n" for number of monthly payments,
+type "a" for annuity monthly payment amount,
+type "p" for loan principal:''')
 cmd = input()
 
-if cmd == 'm':
-    month_pay = int(input("Enter the monthly payment:\n"))
-    calc_period(loan_pay, month_pay)
-elif cmd == 'p':
-    month_num = int(input("Enter the number of months:\n"))
-    calc_payment(loan_pay, month_num)
+if cmd == 'n':
+    print("Enter the loan principal:")
+    loan_pay = int(input())
+    print("Enter the monthly payment:")
+    month_pay = int(input())
+    print("Enter the loan interest:")
+    rate = float(input())
+    calc_period(loan_pay, month_pay, rate)
+elif cmd == 'a':
+    print("Enter the loan principal:")
+    loan_pay = int(input())
+    print("Enter the number of periods:")
+    m = int(input())
+    print("Enter the loan interest:")
+    rate = float(input())
+    calc_payment(loan_pay, m, rate)
+else:
+    print("Enter the annuity payment:")
+    annu_pay = float(input())
+    print("Enter the number of periods:")
+    m = int(input())
+    print("Enter the loan interest:")
+    rate = float(input())
+    calc_apayment(annu_pay, m, rate)
